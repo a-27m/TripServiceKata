@@ -1,19 +1,23 @@
 ﻿using System.Collections.Generic;
 using TripServiceKata.Exception;
-using TripServiceKata.User;
+using TripServiceKata.Model;
 
-namespace TripServiceKata.Trip
+namespace TripServiceKata.Model
 {
     public class TripService
     {
-        public List<Trip> GetTripsByUser(User.User user)
+        private readonly ITripDAO _tripDao;
+        public TripService(ITripDAO tripDao)
+        {
+            _tripDao = tripDao;
+        }
+        public List<Trip> GetTripsByUser(User user, User loggedUser)
         {
             List<Trip> tripList = new List<Trip>();
-            User.User loggedUser = UserSession.GetInstance().GetLoggedUser();
             bool isFriend = false;
             if (loggedUser != null)
             {
-                foreach(User.User friend in user.GetFriends())
+                foreach(User friend in user.GetFriends())
                 {
                     if (friend.Equals(loggedUser))
                     {
@@ -23,7 +27,7 @@ namespace TripServiceKata.Trip
                 }
                 if (isFriend)
                 {
-                    tripList = TripDAO.FindTripsByUser(user);
+                    tripList = _tripDao.FindTripsByUser(user);
                 }
                 return tripList;
             }
